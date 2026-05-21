@@ -1,0 +1,45 @@
+# Dependencies
+node_modules
+
+# Build output
+.next
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Documentation
+*.md
+!README.md
+
+# Python scripts (not needed for deployment)
+*.py
+
+# PowerShell scripts
+*.ps1
+
+# Backup files
+*.backup
+
+# Test files
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Development files
+.env.local
+.env.development
+.env.development.local
+
+# Misc
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
