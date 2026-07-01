@@ -3,6 +3,11 @@
 import { InventoryItem } from "@/types/inventory";
 import JewelryImage from "./JewelryImage";
 import { useState } from "react";
+import { Check, ShoppingCart } from "lucide-react";
+import Link from "next/link";
+import { useCart } from "@/lib/CartContext";
+import { useRates } from "@/lib/GoldRateContext";
+import { computePriceBreakdown, formatINR, PRICING_CONFIG } from "@/lib/pricing";
 
 interface InventoryDetailProps {
   item: InventoryItem;
@@ -11,6 +16,23 @@ interface InventoryDetailProps {
 export default function InventoryDetail({ item }: InventoryDetailProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const mainImage = item.images[selectedImageIndex] || "";
+  const { addToCart } = useCart();
+  const { rates, loading } = useRates();
+  const [justAdded, setJustAdded] = useState(false);
+
+  const priceReady = Object.keys(rates).length > 0 || !loading;
+  const breakdown = computePriceBreakdown(item, rates);
+  const isStaleRate = breakdown.element
+    ? rates[breakdown.element]?.isStale
+    : false;
+
+  const handleAddToCart = () => {
+    if (!item.inStock) return;
+    // Step 4: lock in the live price at the moment of adding to the bag.
+    addToCart(item, breakdown.total, 1);
+    setJustAdded(true);
+    window.setTimeout(() => setJustAdded(false), 1800);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -100,13 +122,85 @@ export default function InventoryDetail({ item }: InventoryDetailProps) {
         <div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">{item.name}</h1>
           <div className="flex items-center gap-4 mb-4">
-            <span className="text-4xl font-bold text-gold-600 dark:text-gold-400">
-              ${item.price.toLocaleString()}
-            </span>
+            {priceReady ? (
+              <span className="text-4xl font-bold text-gold-600 dark:text-gold-400">
+                {formatINR(breakdown.total)}
+              </span>
+            ) : (
+              <span className="h-10 w-40 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            )}
             {item.karat && (
               <span className="text-xl text-gray-600 dark:text-gray-400">{item.karat}k Gold</span>
             )}
           </div>
+
+          {priceReady && (
+            <div className="mb-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Price breakdown
+                </h3>
+                {isStaleRate && (
+                  <span className="text-[11px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300">
+                    cached rate
+                  </span>
+                )}
+              </div>
+              <dl className="space-y-1.5 text-sm">
+                {breakdown.isDynamic ? (
+                  <>
+                    <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                      <dt>
+                        {breakdown.label ?? "Metal"} value
+                        {item.weight && breakdown.effectivePerUnit
+                          ? ` (${item.weight}g × ${formatINR(
+                              breakdown.effectivePerUnit,
+                            )}/g)`
+                          : ""}
+                      </dt>
+                      <dd className="text-gray-900 dark:text-gray-100">
+                        {formatINR(breakdown.metalValue)}
+                      </dd>
+                    </div>
+                    <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                      <dt>Making charges ({PRICING_CONFIG.makingChargePct}%)</dt>
+                      <dd className="text-gray-900 dark:text-gray-100">
+                        {formatINR(breakdown.makingCharges)}
+                      </dd>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                    <dt>Base price</dt>
+                    <dd className="text-gray-900 dark:text-gray-100">
+                      {formatINR(breakdown.metalValue)}
+                    </dd>
+                  </div>
+                )}
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                  <dt>GST ({PRICING_CONFIG.gstPct}%)</dt>
+                  <dd className="text-gray-900 dark:text-gray-100">
+                    {formatINR(breakdown.gst)}
+                  </dd>
+                </div>
+                <div className="flex justify-between pt-2 mt-1 border-t border-gray-200 dark:border-gray-700 font-semibold">
+                  <dt className="text-gray-900 dark:text-gray-100">Total</dt>
+                  <dd className="text-gold-700 dark:text-gold-300">
+                    {formatINR(breakdown.total)}
+                  </dd>
+                </div>
+              </dl>
+              {breakdown.isDynamic && (
+                <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                  Price updates live with the {breakdown.label ?? "metal"} rate
+                  {breakdown.purity && breakdown.purity < 1
+                    ? ` (purity ${(breakdown.purity * 100).toFixed(1)}%)`
+                    : ""}
+                  . Final price is re-verified at checkout.
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="space-y-4 mb-6">
             <div>
@@ -145,15 +239,40 @@ export default function InventoryDetail({ item }: InventoryDetailProps) {
           </div>
 
           <button
+            type="button"
+            onClick={handleAddToCart}
             disabled={!item.inStock}
-            className={`w-full py-3 px-6 rounded-lg font-semibold text-lg transition-colors ${
-              item.inStock
-                ? "bg-gold-600 dark:bg-gold-500 text-white hover:bg-gold-700 dark:hover:bg-gold-600"
-                : "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+            className={`w-full py-3 px-6 rounded-lg font-semibold text-lg transition-colors flex items-center justify-center gap-2 ${
+              !item.inStock
+                ? "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                : justAdded
+                  ? "bg-green-600 text-white"
+                  : "bg-gold-600 dark:bg-gold-500 text-white hover:bg-gold-700 dark:hover:bg-gold-600"
             }`}
           >
-            {item.inStock ? "Add to Cart" : "Out of Stock"}
+            {!item.inStock ? (
+              "Out of Stock"
+            ) : justAdded ? (
+              <>
+                <Check className="w-5 h-5" />
+                Added to Cart
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="w-5 h-5" />
+                Add to Cart
+              </>
+            )}
           </button>
+
+          {item.inStock && (
+            <Link
+              href="/cart"
+              className="mt-3 w-full py-3 px-6 rounded-lg font-semibold text-lg border-2 border-gold-600 dark:border-gold-400 text-gold-700 dark:text-gold-300 hover:bg-gold-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center"
+            >
+              View Cart
+            </Link>
+          )}
         </div>
       </div>
     </div>

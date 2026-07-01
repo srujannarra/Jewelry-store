@@ -28,6 +28,10 @@ yarn-error.log*
 .env*.local
 .env
 
+# runtime rate cache + history (per-element); element configs are committed
+/data/rates/cache/
+/data/rates/history/
+
 # vercel
 .vercel
 

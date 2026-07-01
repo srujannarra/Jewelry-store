@@ -1,0 +1,13 @@
+{
+  "key": "bronze",
+  "label": "Bronze",
+  "providerSymbol": null,
+  "unit": "gram",
+  "live": false,
+  "cacheTtlSeconds": 86400,
+  "fallbackPerUnitInr": 1.2,
+  "defaultPurity": 1,
+  "usesKaratPurity": false,
+  "matchesMaterials": ["bronze"],
+  "notes": "Bronze is a copper-tin alloy with no precious-metal spot market (no XAU/XAG/XPT/XPD ticker). Priced from a manually maintained per-gram INR rate. Update fallbackPerUnitInr periodically or wire to a copper feed."
+}

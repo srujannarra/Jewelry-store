@@ -1,0 +1,13 @@
+{
+  "key": "gold",
+  "label": "Gold",
+  "providerSymbol": "XAU",
+  "unit": "gram",
+  "live": true,
+  "cacheTtlSeconds": 300,
+  "fallbackPerUnitInr": 7100,
+  "defaultPurity": 1,
+  "usesKaratPurity": true,
+  "matchesMaterials": ["gold"],
+  "notes": "24K spot via GoldAPI (XAU/INR) with MetalpriceAPI fallback. Karat purity applied per item."
+}

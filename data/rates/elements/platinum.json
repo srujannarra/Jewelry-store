@@ -1,0 +1,13 @@
+{
+  "key": "platinum",
+  "label": "Platinum",
+  "providerSymbol": "XPT",
+  "unit": "gram",
+  "live": true,
+  "cacheTtlSeconds": 300,
+  "fallbackPerUnitInr": 3300,
+  "defaultPurity": 0.95,
+  "usesKaratPurity": false,
+  "matchesMaterials": ["platinum"],
+  "notes": "Spot via GoldAPI (XPT/INR) with MetalpriceAPI fallback. Default purity 0.95 (PT950)."
+}

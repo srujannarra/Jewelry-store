@@ -1,0 +1,13 @@
+{
+  "key": "palladium",
+  "label": "Palladium",
+  "providerSymbol": "XPD",
+  "unit": "gram",
+  "live": true,
+  "cacheTtlSeconds": 300,
+  "fallbackPerUnitInr": 3000,
+  "defaultPurity": 0.95,
+  "usesKaratPurity": false,
+  "matchesMaterials": ["palladium"],
+  "notes": "Spot via GoldAPI (XPD/INR) with MetalpriceAPI fallback. Default purity 0.95."
+}

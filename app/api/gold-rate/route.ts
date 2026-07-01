@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { getGoldRate } from "@/lib/goldRate";
 
+// HTTP header values must be ISO-8859-1; strip anything outside that range
+// (e.g. em dashes used in human-readable source labels).
+function headerSafe(value: string): string {
+  return value.replace(/[^\x20-\x7E]/g, "-").trim();
+}
+
 export async function GET() {
   try {
     // Fetch fresh gold rate from official sources
@@ -10,9 +16,10 @@ export async function GET() {
     // Allow caching but revalidate frequently
     return NextResponse.json(goldRate, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
-        'X-Gold-Rate-Source': goldRate.source,
-        'X-Last-Updated': goldRate.lastUpdated,
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'X-Gold-Rate-Source': headerSafe(goldRate.source),
+        'X-Last-Updated': headerSafe(goldRate.lastUpdated),
+        'X-Gold-Rate-Stale': goldRate.isStale ? 'true' : 'false',
       },
     });
   } catch (error) {
@@ -24,8 +31,8 @@ export async function GET() {
   }
 }
 
-// Revalidate every 60 seconds (for ISR)
-export const revalidate = 60;
+// Revalidate every 5 minutes (matches the server-side cache TTL)
+export const revalidate = 300;
 
 
 

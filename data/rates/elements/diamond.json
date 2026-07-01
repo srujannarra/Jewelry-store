@@ -1,0 +1,13 @@
+{
+  "key": "diamond",
+  "label": "Diamond",
+  "providerSymbol": null,
+  "unit": "carat",
+  "live": false,
+  "cacheTtlSeconds": 86400,
+  "fallbackPerUnitInr": 55000,
+  "defaultPurity": 1,
+  "usesKaratPurity": false,
+  "matchesMaterials": ["diamond"],
+  "notes": "Diamonds are priced per carat (not per gram) and depend on the 4Cs, so there is no single spot rate. Uses a manually maintained per-carat INR baseline. Can be wired to OpenFacet (https://data.openfacet.net/index.json) or IDEX later."
+}

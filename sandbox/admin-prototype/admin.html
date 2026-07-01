@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>SVJ Admin Control Panel (Sandbox)</title>
+    <link rel="stylesheet" href="./styles.css?v=6" />
+    <!-- QR rendering happens entirely in-browser; the secret is not sent anywhere -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+  </head>
+  <body>
+    <!-- ============================ SETUP (first run) ============================ -->
+    <section id="screen-setup" class="auth-wrap hidden">
+      <div class="auth-card">
+        <div class="brand"><span class="dot">SVJ</span> <span>Admin Setup</span></div>
+        <h1>Create the owner account</h1>
+        <p class="sub">One-time setup. Choose a password, then link Microsoft Authenticator.</p>
+
+        <div id="setup-step1">
+          <label>Username</label>
+          <input type="text" value="admin" disabled />
+          <label for="setup-pw">Choose a password</label>
+          <input
+            type="text"
+            id="setup-pw"
+            class="plain-field"
+            placeholder="Type your new password here"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            tabindex="0"
+          />
+          <p class="pw-hint" id="setup-pw-hint">Characters typed: 0</p>
+          <label for="setup-pw2">Confirm password</label>
+          <input
+            type="text"
+            id="setup-pw2"
+            class="plain-field"
+            placeholder="Type the same password again"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            tabindex="0"
+          />
+          <p class="pw-hint" id="setup-pw2-hint">Characters typed: 0</p>
+          <div class="error-text" id="setup-err1"></div>
+          <button class="btn primary btn-block" id="setup-next">Continue to authenticator setup</button>
+        </div>
+
+        <div id="setup-step2" class="hidden">
+          <p class="sub">Scan this in <strong>Microsoft Authenticator</strong> (Add account → Other account), or type the key manually.</p>
+          <div class="qr-box"><canvas id="setup-qr"></canvas></div>
+          <p class="small muted center">Manual setup key:</p>
+          <div class="secret-key" id="setup-secret">—</div>
+          <label>Enter the 6-digit code from the app to confirm</label>
+          <input type="text" id="setup-otp" class="otp-input" maxlength="6" inputmode="numeric" placeholder="------" />
+          <div class="error-text" id="setup-err2"></div>
+          <a class="small muted" id="setup-reveal" href="#" style="display:inline-block;margin-top:8px">Sandbox helper: reveal current code</a>
+          <button class="btn primary btn-block" id="setup-finish">Finish setup &amp; create account</button>
+          <div class="callout">
+            Sandbox note: the password hash and TOTP secret are stored in this browser only.
+            In production they must live on the server.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ LOGIN ============================ -->
+    <section id="screen-login" class="auth-wrap hidden">
+      <div class="auth-card">
+        <div class="brand"><span class="dot">SVJ</span> <span>Admin Control Panel</span></div>
+        <h1>Sign in</h1>
+        <p class="sub">Step 1 of 2 — username &amp; password</p>
+        <form id="login-form" autocomplete="off" novalidate>
+        <label for="login-user">Username</label>
+        <input type="text" id="login-user" name="username" value="admin" autocomplete="off" autocapitalize="off" spellcheck="false" tabindex="0" />
+        <label for="login-pw">Password</label>
+        <input
+          type="text"
+          id="login-pw"
+          class="plain-field"
+          placeholder="Type your password here"
+          autocomplete="off"
+          autocapitalize="off"
+          autocorrect="off"
+          spellcheck="false"
+          tabindex="0"
+        />
+        <p class="pw-hint" id="login-pw-hint">Characters typed: 0</p>
+        <div class="error-text" id="login-err"></div>
+        <button type="submit" class="btn primary btn-block" id="login-btn">Continue</button>
+        </form>
+        <button type="button" class="btn ghost btn-block" id="login-reset" style="margin-top:10px;font-size:13px">
+          Forgot password? Reset sandbox &amp; set up again
+        </button>
+      </div>
+    </section>
+
+    <!-- ============================ 2FA ============================ -->
+    <section id="screen-2fa" class="auth-wrap hidden">
+      <div class="auth-card">
+        <div class="brand"><span class="dot">SVJ</span> <span>Two-step verification</span></div>
+        <h1>Authenticator code</h1>
+        <p class="sub">Step 2 of 2 — open Microsoft Authenticator and enter the 6-digit code.</p>
+        <input type="text" id="twofa-otp" class="otp-input" maxlength="6" inputmode="numeric" placeholder="------" />
+        <p class="small muted center countdown" id="twofa-count"></p>
+        <div class="error-text" id="twofa-err"></div>
+        <a class="small muted" id="twofa-reveal" href="#" style="display:inline-block;margin-top:8px">Sandbox helper: reveal current code</a>
+        <button class="btn primary btn-block" id="twofa-btn">Verify &amp; open dashboard</button>
+        <button class="btn ghost btn-block" id="twofa-back" style="margin-top:8px">← Back</button>
+      </div>
+    </section>
+
+    <!-- ============================ APP ============================ -->
+    <section id="screen-app" class="app hidden">
+      <aside class="sidebar">
+        <div class="brand"><span class="dot">SVJ</span> <span>Admin</span></div>
+        <div class="nav-item active" data-view="dashboard">📊 Daily sales</div>
+        <div class="nav-item" data-view="inventory">📦 Inventory</div>
+        <div class="nav-item" data-view="sheet">➕ Add / edit products</div>
+        <div class="nav-item" data-view="activity">🕑 Activity log</div>
+        <div class="spacer"></div>
+        <div class="nav-item" id="btn-reset">♻️ Reset sandbox</div>
+        <div class="nav-item" id="btn-logout">🔒 Lock &amp; sign out</div>
+      </aside>
+
+      <main class="main">
+        <!-- Dashboard -->
+        <div class="view active" id="view-dashboard">
+          <div class="topbar">
+            <h2>Daily sales</h2>
+            <div class="spacer"></div>
+            <label class="row small" style="margin:0;gap:6px">
+              <input type="checkbox" id="erp-fail" style="width:auto" /> Simulate ERP outage
+            </label>
+            <button class="btn small" id="erp-refresh" style="margin-left:10px">Refresh</button>
+          </div>
+          <div id="dash-body"><p class="muted">Loading sales from ERP…</p></div>
+        </div>
+
+        <!-- Inventory -->
+        <div class="view" id="view-inventory">
+          <div class="topbar"><h2>Inventory</h2><div class="spacer"></div>
+            <button class="btn primary small" id="inv-new">+ New product</button>
+          </div>
+          <div class="toolbar">
+            <input class="search" type="text" id="inv-search" placeholder="Search name / id / sku…" />
+            <label class="row small" style="margin:0;gap:6px">
+              <input type="checkbox" id="inv-show-deleted" style="width:auto" /> Show soft-deleted
+            </label>
+          </div>
+          <div class="card" style="padding:0"><div id="inv-body"></div></div>
+        </div>
+
+        <!-- Sheet -->
+        <div class="view" id="view-sheet">
+          <div class="topbar"><h2 id="sheet-title">Add products</h2><div class="spacer"></div>
+            <span class="valid-pill bad" id="sheet-status">—</span>
+          </div>
+          <p class="muted small">Fill the grid like a spreadsheet. Each column is checked live against the product schema; fix any red note before submitting.</p>
+          <div class="sheet-scroll"><table class="sheet"><thead id="sheet-head"></thead><tbody id="sheet-body"></tbody></table></div>
+          <div class="sheet-foot">
+            <button class="btn small" id="sheet-add-row">+ Add row</button>
+            <div class="spacer"></div>
+            <button class="btn ghost small" id="sheet-cancel">Cancel</button>
+            <button class="btn primary" id="sheet-submit">Submit…</button>
+          </div>
+        </div>
+
+        <!-- Activity -->
+        <div class="view" id="view-activity">
+          <div class="topbar"><h2>Activity log</h2></div>
+          <div class="card" style="padding:0"><div id="activity-body"></div></div>
+        </div>
+      </main>
+    </section>
+
+    <div id="modal-root"></div>
+    <div id="toast" class="toast"></div>
+
+    <script type="module" src="./app.js?v=6"></script>
+  </body>
+</html>

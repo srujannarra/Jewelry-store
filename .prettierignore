@@ -7,6 +7,9 @@ dist
 package-lock.json
 yarn.lock
 
+# Standalone admin prototype — isolated from the main app
+sandbox/
+
 
 
 

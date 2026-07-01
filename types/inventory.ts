@@ -29,11 +29,21 @@ export interface InventoryItem {
 }
 
 export interface GoldRate {
+  /** Live price per gram of 24K (pure) gold, in `currency`. */
   pricePerGram: number;
+  /** Live price per troy ounce of 24K (pure) gold, in `currency`. */
   pricePerOunce: number;
+  /** Display currency for the values above (e.g. "INR"). */
   currency: string;
+  /** USD → INR conversion rate used for legacy/non-gold base prices. */
+  usdToInr?: number;
+  /** Original USD reference values (for transparency / debugging). */
+  pricePerGramUSD?: number;
+  pricePerOunceUSD?: number;
   lastUpdated: string;
   source: string;
+  /** True when served from cache/fallback because live sources failed. */
+  isStale?: boolean;
 }
 
 

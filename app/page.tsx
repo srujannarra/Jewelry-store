@@ -1,33 +1,19 @@
-import { Suspense } from "react";
-import InventoryGrid from "@/components/InventoryGrid";
-import CategoryFilter from "@/components/CategoryFilter";
-import { getInventory } from "@/lib/inventory";
+import ShopByCategory from "@/components/ShopByCategory";
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ category?: string }>;
-}) {
-  const params = await searchParams;
-  const category = (params.category as any) || "All";
-  const inventory = await getInventory(category);
-
+export default function Home() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-          Welcome to Our Jewelry Store
+    <div className="container mx-auto px-4 py-10 md:py-14">
+      <div className="text-center mb-12 md:mb-16 max-w-2xl mx-auto">
+        <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl tracking-wide text-gray-900 dark:text-gray-50 mb-4">
+          Welcome to Shri Vasavi Jewellers
         </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400">
-          Discover our exquisite collection of fine jewelry
+        <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+          Discover our exquisite collection of fine jewelry, crafted for every
+          occasion.
         </p>
       </div>
 
-      <Suspense fallback={<div className="mb-8 text-gray-600 dark:text-gray-400">Loading categories...</div>}>
-        <CategoryFilter />
-      </Suspense>
-      <InventoryGrid inventory={inventory} />
+      <ShopByCategory />
     </div>
   );
 }
-

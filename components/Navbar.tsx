@@ -4,13 +4,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Moon, Sun } from "lucide-react";
+import { Moon, ShoppingCart, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import GoldRateDisplay from "./GoldRateDisplay";
+import { useCart } from "@/lib/CartContext";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+  const { itemCount, isHydrated } = useCart();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -44,6 +46,7 @@ export default function Navbar() {
                 <Link href="/about" className="text-gray-700 dark:text-gray-300">
                   About
                 </Link>
+                <div className="w-9 h-9"></div>
               </div>
             </div>
           </div>
@@ -115,6 +118,25 @@ export default function Navbar() {
                 }`}
               >
                 About
+              </Link>
+              <Link
+                href="/cart"
+                aria-label="View shopping cart"
+                className={`relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                  pathname === "/cart"
+                    ? "text-gold-600 dark:text-gold-400"
+                    : "text-gray-700 dark:text-gray-300"
+                }`}
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {isHydrated && itemCount > 0 && (
+                  <span
+                    aria-label={`${itemCount} items in cart`}
+                    className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-gold-600 dark:bg-gold-500 text-white text-[10px] font-bold flex items-center justify-center shadow-md ring-2 ring-white dark:ring-gray-800"
+                  >
+                    {itemCount > 99 ? "99+" : itemCount}
+                  </span>
+                )}
               </Link>
             </div>
           </div>

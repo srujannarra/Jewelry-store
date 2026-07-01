@@ -26,3 +26,301 @@ body {
   }
 }
 
+/* Home — Shop by Category */
+.shop-by-category {
+  max-width: 72rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ==========================================================================
+   Splash Screen Styles (isolated — only affects .splash-* classes)
+   ========================================================================== */
+
+.splash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at center, #1a120b 0%, #0a0805 55%, #050302 100%);
+  opacity: 1;
+  transition: opacity 600ms ease-out;
+  will-change: opacity;
+}
+
+.splash-overlay--exit {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-logo-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(220px, 38vw, 420px);
+  aspect-ratio: 1 / 1;
+  animation: splash-scale-in 850ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+/* Soft circular ambient halo — provides the main warm glow as a clean
+   round shape so the eye doesn't perceive the rectangular drop-shadow halo. */
+.splash-logo-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: -55%;
+  background: radial-gradient(
+    circle at center,
+    rgba(251, 191, 36, 0.32) 0%,
+    rgba(217, 119, 6, 0.14) 20%,
+    rgba(217, 119, 6, 0.05) 42%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  filter: blur(14px);
+  pointer-events: none;
+  z-index: -1;
+  animation: splash-glow-pulse 2.6s ease-in-out infinite;
+}
+
+/* The PNG has a transparent background, so layered drop-shadows follow the
+   alpha channel and produce a luminous gold glow on the peacock and the
+   "Shri Vasavi Jewellers" text — never a rectangular halo. The wider
+   ambient warmth is handled by the circular ::before halo above. The logo
+   sits directly in the wrapper so its shadow can extend freely with no
+   square clipping. */
+.splash-logo {
+  position: relative;
+  width: 100%;
+  height: auto;
+  display: block;
+  filter:
+    drop-shadow(0 0 6px rgba(251, 191, 36, 0.65))
+    drop-shadow(0 0 14px rgba(217, 119, 6, 0.35));
+  animation: splash-icon-shine 2.6s ease-in-out infinite;
+  z-index: 1;
+}
+
+/* Independent container that clips the shimmer streak to a soft circle so
+   it never appears as a hard diagonal bar past the logo. The drop-shadow
+   on the logo is not affected because this mask only clips its own child. */
+.splash-shimmer-mask {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+  -webkit-mask-image: radial-gradient(circle at center, #000 35%, transparent 75%);
+          mask-image: radial-gradient(circle at center, #000 35%, transparent 75%);
+}
+
+@keyframes splash-icon-shine {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 6px rgba(251, 191, 36, 0.55))
+      drop-shadow(0 0 14px rgba(217, 119, 6, 0.3));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 9px rgba(251, 191, 36, 0.85))
+      drop-shadow(0 0 20px rgba(217, 119, 6, 0.5));
+  }
+}
+
+.splash-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 240, 200, 0.0) 45%,
+    rgba(255, 240, 200, 0.55) 50%,
+    rgba(255, 240, 200, 0.0) 55%,
+    transparent 65%
+  );
+  transform: translateX(-110%);
+  opacity: 0;
+  animation: splash-shimmer-sweep 2400ms ease-in-out 700ms infinite;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.splash-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.splash-particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fef3c7 0%, #fbbf24 40%, rgba(217, 119, 6, 0) 75%);
+  opacity: 0;
+  filter: blur(0.5px);
+  animation: splash-particle-float 2.8s ease-in-out infinite;
+}
+
+.splash-particle-1  { top: 18%; left: 12%; animation-delay: 0ms;   }
+.splash-particle-2  { top: 28%; left: 82%; animation-delay: 250ms; width: 3px; height: 3px; }
+.splash-particle-3  { top: 70%; left: 18%; animation-delay: 500ms; width: 6px; height: 6px; }
+.splash-particle-4  { top: 82%; left: 78%; animation-delay: 150ms; }
+.splash-particle-5  { top: 12%; left: 55%; animation-delay: 700ms; width: 3px; height: 3px; }
+.splash-particle-6  { top: 88%; left: 45%; animation-delay: 400ms; }
+.splash-particle-7  { top: 45%; left: 8%;  animation-delay: 900ms; width: 4px; height: 4px; }
+.splash-particle-8  { top: 50%; left: 92%; animation-delay: 100ms; width: 4px; height: 4px; }
+.splash-particle-9  { top: 35%; left: 30%; animation-delay: 600ms; width: 3px; height: 3px; }
+.splash-particle-10 { top: 65%; left: 70%; animation-delay: 350ms; width: 3px; height: 3px; }
+
+.splash-error-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(10, 8, 5, 0.52);
+  backdrop-filter: blur(8px);
+}
+
+.splash-error-dialog {
+  width: min(100%, 28rem);
+  padding: 1.5rem;
+  border: 1px solid rgba(217, 119, 6, 0.32);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.96);
+  color: #1f2937;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.dark .splash-error-dialog {
+  background: rgba(17, 24, 39, 0.96);
+  color: #f9fafb;
+}
+
+.splash-error-dialog h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: #78350f;
+}
+
+.dark .splash-error-dialog h2 {
+  color: #fde68a;
+}
+
+.splash-error-dialog p {
+  margin: 0;
+  line-height: 1.6;
+  color: #4b5563;
+}
+
+.dark .splash-error-dialog p {
+  color: #d1d5db;
+}
+
+.splash-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.splash-error-actions button {
+  min-height: 2.5rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid #92400e;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.splash-error-actions button:first-child {
+  background: #92400e;
+  color: white;
+}
+
+.splash-error-actions button:last-child {
+  background: transparent;
+  color: #92400e;
+}
+
+.dark .splash-error-actions button {
+  border-color: #fcd34d;
+}
+
+.dark .splash-error-actions button:first-child {
+  background: #d97706;
+  color: white;
+}
+
+.dark .splash-error-actions button:last-child {
+  color: #fde68a;
+}
+
+.splash-error-actions button:hover {
+  background: #78350f;
+  color: white;
+  border-color: #78350f;
+}
+
+@keyframes splash-scale-in {
+  0%   { opacity: 0; transform: scale(0.88) translateY(8px); }
+  60%  { opacity: 1; transform: scale(1.025) translateY(0); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes splash-glow-pulse {
+  0%, 100% { opacity: 0.65; transform: scale(0.98); }
+  50%      { opacity: 1;    transform: scale(1.08); }
+}
+
+@keyframes splash-shimmer-sweep {
+  0%   { transform: translateX(-110%); opacity: 0; }
+  15%  { opacity: 0.9; }
+  55%  { transform: translateX(110%); opacity: 0.9; }
+  70%  { transform: translateX(110%); opacity: 0; }
+  100% { transform: translateX(110%); opacity: 0; }
+}
+
+@keyframes splash-particle-float {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  20%  { opacity: 0.9; }
+  50%  { opacity: 1; transform: translate(10px, -16px) scale(1); }
+  80%  { opacity: 0.7; }
+  100% { opacity: 0; transform: translate(20px, -28px) scale(0.6); }
+}
+
+/* Respect user motion preferences — gracefully degrade to a simple fade */
+@media (prefers-reduced-motion: reduce) {
+  .splash-logo-wrapper {
+    animation: splash-fade-in 350ms ease-out forwards;
+  }
+  .splash-logo {
+    animation: none !important;
+  }
+  .splash-shimmer,
+  .splash-particle {
+    animation: none !important;
+    display: none !important;
+  }
+  .splash-logo-wrapper::before {
+    animation: none !important;
+  }
+  @keyframes splash-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}
+

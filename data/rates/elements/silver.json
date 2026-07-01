@@ -1,0 +1,13 @@
+{
+  "key": "silver",
+  "label": "Silver",
+  "providerSymbol": "XAG",
+  "unit": "gram",
+  "live": true,
+  "cacheTtlSeconds": 300,
+  "fallbackPerUnitInr": 95,
+  "defaultPurity": 0.925,
+  "usesKaratPurity": false,
+  "matchesMaterials": ["silver", "sterling silver"],
+  "notes": "Spot via GoldAPI (XAG/INR) with MetalpriceAPI fallback. Default purity 0.925 (sterling)."
+}
